@@ -8,6 +8,9 @@ var bodyParser = require('body-parser');
 
 var index = require('./routes/index');
 var users = require('./routes/users');
+var peers = require('./routes/peers')
+
+var PeerServer = require('peer').PeerServer;
 
 var app = express();
 
@@ -25,6 +28,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', index);
 app.use('/users', users);
+app.use('/peer-portal', peers);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -43,5 +47,8 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
+// Initializing the peer connections server
+var server = PeerServer({port: 9000, path: '/peer-portal'});
 
 module.exports = app;
