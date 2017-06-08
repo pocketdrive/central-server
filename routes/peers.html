@@ -15,7 +15,11 @@
         host: 'localhost',
         port: 9000,
         path: 'peer-portal',
-        debug: 3
+        debug: 3,
+        config: {'iceServers': [
+            { url: 'stun:stun.l.google.com:19302' },
+            { url: 'turn:anuradha@192.248.8.242:3478', username: 'anuradha', credential: 'sanjeewa' }
+        ]}
     };
     var peer = new Peer(peerOptions);
 
