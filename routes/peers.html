@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <script src="http://cdn.peerjs.com/0.3/peer.min.js"></script>
+    <script src="javascripts/peer.min.js"></script>
 </head>
 <body>
 <input id="peerId" value="asd" type="text">
@@ -12,14 +12,10 @@
 </body>
 <script>
     var peerOptions = {
-        host: '192.168.8.242',
+        host: 'localhost',
         port: 9000,
         path: 'peer-portal',
-        debug: 3,
-        config: {'iceServers': [
-            { url: 'stun:stun.l.google.com:19302' },
-            { url: 'turn:dvios@192.168.8.242', credential: 'dvios1234' }
-        ]}
+        debug: 3
     };
     var peer = new Peer(peerOptions);
 
