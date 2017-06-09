@@ -8,7 +8,7 @@ var bodyParser = require('body-parser');
 
 var index = require('./routes/index');
 var users = require('./routes/users');
-var peers = require('./routes/peers')
+var peers = require('./routes/peers');
 
 var PeerServer = require('peer').PeerServer;
 
