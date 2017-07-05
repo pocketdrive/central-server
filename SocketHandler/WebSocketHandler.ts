@@ -1,65 +1,83 @@
 /**
  * Created by anuradhawick on 6/8/17.
  */
-// const WebSocket = require('ws');
+
 import * as WebSocket from 'ws';
-const uuid = require('uuid/v4');
-const wss = new WebSocket.Server({port: 8080});
-const _ = require('lodash');
+import * as _ from 'lodash';
+
+import UserManagement from '../UserManagement/UserManagement';
 
 
-export class WebSocketHandler() {
-    
-}
+export default class WebSocketHandler {
+    wss: WebSocket.Server;
+    // Indexed by device id and username
+    static activeUsers: Object = {};
 
-let connections = {};
-let connectionsCount = 0;
+    constructor() {
+        this.wss = new WebSocket.Server({port: 8080});
+        this.init();
+    }
 
-const wsTemplate = {
-    username: null,
-    peerId: null,
-};
+    init() {
+        this.wss.on('connection', (ws: WebSocket) => WebSocketHandler.connected(ws));
+    }
 
+    static connected(ws: WebSocket) {
+        ws.on('message', (data: string) => WebSocketHandler.onMessage(data, ws));
+        ws.on('close', () => WebSocketHandler.onClose(ws));
+    }
 
-wss.on('connection', function connection(ws, req) {
-    ws.isAlive = true;
-    ws.on('pong', heartbeat);
+    static onMessage(msg: string, ws: WebSocket) {
+        let msgObj;
+        try {
+            msgObj = JSON.parse(msg);
+            WebSocketHandler.parseMessage(msgObj, ws);
+        } catch (e) {
+            // Do nothing
+        }
+    }
 
-    ws.on('message', function handleMessage(message) {
-        const data = JSON.parse(message);
-        console.log(data);
-        switch (data.type) {
-            case 'register':
-                let wsObj = _.cloneDeep(wsTemplate);
-                wsObj.username = data.username;
-                wsObj.peerId = data.peerId;
-                connectionsCount++;
-                connections[wsObj.peerId] = wsObj;
+    static onClose(ws: WebSocket) {
+        console.log('closed');
+        ws.close();
+    }
+
+    static async parseMessage(msg: any, ws: WebSocket) {
+
+        switch (msg.type) {
+            // register the user in central server
+            case 'createAccount':
+                let userData = msg.data;
+                let status = await UserManagement.createUser(userData);
+                ws.send(JSON.stringify({success: status, error: !status ? 'user exists' : ''}));
                 break;
-            case 'offer':
-                // Find the target peer and send the signal
+            case 'registerDevice':
+                let deviceInfo = msg.data;
+                // Update -> check if already registered
+                WebSocketHandler.activeUsers[deviceInfo.deviceId] = {ws: ws};
+                ws.send(JSON.stringify({success: true, error: ''}));
                 break;
-            case 'answer':
-                // send the initiator and send the signal
+            case 'connectTo':
+                let targetInfo = msg.data;
+                break;
+            case 'isOnline':
+                let info = msg.data;
+                if (_.get(WebSocketHandler.activeUsers, info.targetId, false)) {
+                    ws.send(true);
+                } else {
+                    ws.send(false);
+                }
+                break;
+            case 'getActiveDevices':
                 break;
         }
-    });
-});
-
-function heartbeat() {
-    this.isAlive = true;
+    }
 }
-
-setInterval(function ping() {
-    console.log('interval actions');
-    wss.clients.forEach(function each(ws) {
-        console.log('each ws ', ws.uuid);
-        if (ws.isAlive === false) {
-            console.log('socket destroyed');
-            return ws.terminate();
-        }
-
-        ws.isAlive = false;
-        ws.ping('', false, true);
-    });
-}, 5000);
+/**
+ * security needs to be added using tokens or something
+ * Sample messages
+ * createAccount {"username":"anuradha","firstName":"Anuradha","lastName":"Wickramarachchi","password":"1234"}
+ * registerDevice {"username":"anuradha","deviceId":"device1234"}
+ * connectTo {"targetId":"device1234","offer":<OFFER STRING>}
+ * isOnline {"targetId":"device1234"}
+ */
