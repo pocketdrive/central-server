@@ -6,12 +6,15 @@ import * as WebSocket from 'ws';
 import * as _ from 'lodash';
 
 import UserManagement from '../UserManagement/UserManagement';
+import * as wsh from './WSHelper';
 
+const sampleMessage = {success: true, error: '', message: ''};
+const sampleActiveUser: { deviceId: string, username: string, ws: WebSocket } = {deviceId: '', username: '', ws: null};
 
 export default class WebSocketHandler {
     wss: WebSocket.Server;
     // Indexed by device id and username
-    static activeUsers: Object = {};
+    static activeUsers: Array<any> = [];
 
     constructor() {
         this.wss = new WebSocket.Server({port: 8080});
@@ -38,37 +41,26 @@ export default class WebSocketHandler {
     }
 
     static onClose(ws: WebSocket) {
-        console.log('closed');
-        ws.close();
+        wsh.removeActiveUser(ws);
     }
 
     static async parseMessage(msg: any, ws: WebSocket) {
-
         switch (msg.type) {
             // register the user in central server
             case 'createAccount':
-                let userData = msg.data;
-                let status = await UserManagement.createUser(userData);
-                ws.send(JSON.stringify({success: status, error: !status ? 'user exists' : ''}));
+                await wsh.createAccount(msg.data, ws);
                 break;
             case 'registerDevice':
-                let deviceInfo = msg.data;
-                // Update -> check if already registered
-                WebSocketHandler.activeUsers[deviceInfo.deviceId] = {ws: ws};
-                ws.send(JSON.stringify({success: true, error: ''}));
+                wsh.registerDevice(msg.data, ws);
                 break;
             case 'connectTo':
                 let targetInfo = msg.data;
                 break;
             case 'isOnline':
-                let info = msg.data;
-                if (_.get(WebSocketHandler.activeUsers, info.targetId, false)) {
-                    ws.send(true);
-                } else {
-                    ws.send(false);
-                }
+                wsh.isOnline(msg.data, ws);
                 break;
             case 'getActiveDevices':
+                wsh.getOnlineUsers(ws);
                 break;
         }
     }
@@ -79,5 +71,5 @@ export default class WebSocketHandler {
  * createAccount {"username":"anuradha","firstName":"Anuradha","lastName":"Wickramarachchi","password":"1234"}
  * registerDevice {"username":"anuradha","deviceId":"device1234"}
  * connectTo {"targetId":"device1234","offer":<OFFER STRING>}
- * isOnline {"targetId":"device1234"}
+ * isOnline {"targetId":"device1234", "username":"anuradha"}
  */
