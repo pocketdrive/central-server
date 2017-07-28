@@ -3,9 +3,7 @@
  */
 
 import * as WebSocket from 'ws';
-import * as _ from 'lodash';
 
-import UserManagement from '../UserManagement/UserManagement';
 import * as wsh from './WSHelper';
 
 const sampleMessage = {success: true, error: '', message: ''};
