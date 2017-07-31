@@ -1,18 +1,14 @@
 /**
  * Created by anuradhawick on 6/8/17.
  */
-
 import * as WebSocket from 'ws';
 
-import * as wsh from './WSHelper';
+import * as wsh from './ws-helper';
+import * as wsm from './ws-messages'
 
-const sampleMessage = {success: true, error: '', message: ''};
-const sampleActiveUser: { deviceId: string, username: string, ws: WebSocket } = {deviceId: '', username: '', ws: null};
 
 export default class WebSocketHandler {
     wss: WebSocket.Server;
-    // Indexed by device id and username
-    static activeUsers: Array<any> = [];
 
     constructor() {
         this.wss = new WebSocket.Server({port: 8080});
@@ -29,6 +25,7 @@ export default class WebSocketHandler {
     }
 
     static onMessage(msg: string, ws: WebSocket) {
+        console.log('Message received: ' + msg);
         let msgObj;
         try {
             msgObj = JSON.parse(msg);
@@ -45,19 +42,20 @@ export default class WebSocketHandler {
     static async parseMessage(msg: any, ws: WebSocket) {
         switch (msg.type) {
             // register the user in central server
-            case 'createAccount':
+            case wsm.createAccount:
                 await wsh.createAccount(msg.data, ws);
                 break;
-            case 'registerDevice':
+            case wsm.registerDevice:
                 wsh.registerDevice(msg.data, ws);
                 break;
-            case 'connectTo':
+            case wsm.connectTo:
                 let targetInfo = msg.data;
+                // TODO
                 break;
-            case 'isOnline':
+            case wsm.isOnline:
                 wsh.isOnline(msg.data, ws);
                 break;
-            case 'getActiveDevices':
+            case wsm.getActiveDevices:
                 wsh.getOnlineUsers(ws);
                 break;
         }
