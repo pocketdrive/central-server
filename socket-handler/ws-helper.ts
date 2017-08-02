@@ -55,7 +55,7 @@ export async function createAccount(userData, ws: WebSocket) {
 
 export function isOnline(info, ws: WebSocket) {
     let index = _.findIndex(activeUsers, {
-        targetId: info.targetId,
+        deviceId: info.deviceId,
         username: info.username
     });
     let outputMessage = _.cloneDeep(sampleMessage);
@@ -81,4 +81,45 @@ export function getOnlineUsers(ws: WebSocket) {
     });
 
     ws.send(JSON.stringify(outputMessage));
+}
+
+export function sendOfferToDevice(data, ws: WebSocket) {
+    let outputMessage = _.cloneDeep(sampleMessage);
+    let targetUser = _.find(activeUsers, {
+        deviceId: data.deviceId,
+        username: data.username
+    });
+
+    outputMessage.type = wsm.getActiveDevices;
+
+    if (_.isEmpty(targetUser)) {
+        outputMessage.message = 'No user found to send the offer';
+        outputMessage.success = false;
+        outputMessage.error = `Target user don't exists or not online`;
+    } else {
+        outputMessage.message = 'Sending offer to target';
+        ws.send(JSON.stringify(outputMessage));
+
+        const messageToPeer = {
+            type: wsm.connectionOffer,
+            offer: data.offer,
+            fromUsername: data.fromUsername,
+            fromDeviceId: data.fromDeviceId
+        };
+        targetUser.ws.send(JSON.stringify(messageToPeer));
+    }
+}
+
+export function passAnswerToTarget(data) {
+    let targetUser = _.find(activeUsers, {
+        username: data.acceptedUsername,
+        deviceId: data.acceptedDeviceId
+    });
+
+    if (!_.isEmpty(targetUser)) {
+        let outputMessage = _.cloneDeep(sampleMessage);
+        outputMessage.type = wsm.acceptOffer;
+        outputMessage['answer'] = data.answer;
+        targetUser.ws.send(JSON.stringify(outputMessage));
+    }
 }

@@ -25,7 +25,6 @@ export default class WebSocketHandler {
     }
 
     static onMessage(msg: string, ws: WebSocket) {
-        console.log('Message received: ' + msg);
         let msgObj;
         try {
             msgObj = JSON.parse(msg);
@@ -41,16 +40,18 @@ export default class WebSocketHandler {
 
     static async parseMessage(msg: any, ws: WebSocket) {
         switch (msg.type) {
-            // register the user in central server
             case wsm.createAccount:
                 await wsh.createAccount(msg.data, ws);
                 break;
             case wsm.registerDevice:
                 wsh.registerDevice(msg.data, ws);
                 break;
-            case wsm.connectTo:
+            case wsm.connectionOffer:
                 let targetInfo = msg.data;
-                // TODO
+                wsh.sendOfferToDevice(targetInfo, ws);
+                break;
+            case wsm.acceptOffer:
+                wsh.passAnswerToTarget(msg.data);
                 break;
             case wsm.isOnline:
                 wsh.isOnline(msg.data, ws);
@@ -66,6 +67,9 @@ export default class WebSocketHandler {
  * Sample messages
  * createAccount {"username":"anuradha","firstName":"Anuradha","lastName":"Wickramarachchi","password":"1234"}
  * registerDevice {"username":"anuradha","deviceId":"device1234"}
- * connectTo {"targetId":"device1234","offer":<OFFER STRING>}
- * isOnline {"targetId":"device1234", "username":"anuradha"}
+ * connectionOffer {"deviceId":"device1234","username":"anuradha","offer":<OFFER STRING>,
+ *                  "fromUsername":"username",
+ *                  "fromDeviceId": "deviceId"}
+ * acceptOffer {"acceptedUsername":"username", "acceptedDeviceId":"deviceId","answer":<ANSWER STRING>}
+ * isOnline {"deviceId":"device1234", "username":"anuradha"}
  */
