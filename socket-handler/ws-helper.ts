@@ -16,7 +16,7 @@ export function removeActiveUser(ws: WebSocket) {
     _.remove(activeUsers, data => {
         return data.ws === ws;
     });
-    console.log('closed');
+
     ws.close();
 }
 
@@ -90,12 +90,14 @@ export function sendOfferToDevice(data, ws: WebSocket) {
         username: data.username
     });
 
-    outputMessage.type = wsm.getActiveDevices;
+    outputMessage.type = wsm.connectionOffer;
 
     if (_.isEmpty(targetUser)) {
-        outputMessage.message = 'No user found to send the offer';
         outputMessage.success = false;
-        outputMessage.error = `Target user don't exists or not online`;
+        outputMessage.error = 'Target user does not exists or not online';
+        outputMessage.message = 'Please check again later, or contact link owner';
+
+        ws.send(JSON.stringify(outputMessage));
     } else {
         outputMessage.message = 'Sending offer to target';
         ws.send(JSON.stringify(outputMessage));
