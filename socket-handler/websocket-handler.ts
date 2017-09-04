@@ -39,26 +39,38 @@ export default class WebSocketHandler {
     }
 
     static async parseMessage(msg: any, ws: WebSocket) {
-        switch (msg.type) {
-            case wsm.createAccount:
-                await wsh.createAccount(msg.data, ws);
-                break;
-            case wsm.registerDevice:
-                wsh.registerDevice(msg.data, ws);
-                break;
-            case wsm.connectionOffer:
-                let targetInfo = msg.data;
-                wsh.sendOfferToDevice(targetInfo, ws);
-                break;
-            case wsm.acceptOffer:
-                wsh.passAnswerToTarget(msg.data);
-                break;
-            case wsm.isOnline:
-                wsh.isOnline(msg.data, ws);
-                break;
-            case wsm.getActiveDevices:
-                wsh.getOnlineUsers(ws);
-                break;
+        if (msg.event) {
+            switch(msg.event) {
+                case wsm.webConsoleRegister:
+                    wsh.registerDevice(msg.data, ws);
+                    break;
+                case wsm.webConsoleRelay:
+                    console.log('RELAY TO DEVICE', msg.data);
+                    wsh.relayWebConsoleMessage(msg.data)
+                    break;
+            }
+        } else {
+            switch (msg.type) {
+                case wsm.createAccount:
+                    await wsh.createAccount(msg.data, ws);
+                    break;
+                case wsm.registerDevice:
+                    wsh.registerDevice(msg.data, ws);
+                    break;
+                case wsm.connectionOffer:
+                    let targetInfo = msg.data;
+                    wsh.sendOfferToDevice(targetInfo, ws);
+                    break;
+                case wsm.acceptOffer:
+                    wsh.passAnswerToTarget(msg.data);
+                    break;
+                case wsm.isOnline:
+                    wsh.isOnline(msg.data, ws);
+                    break;
+                case wsm.getActiveDevices:
+                    wsh.getOnlineUsers(ws);
+                    break;
+            }
         }
     }
 }

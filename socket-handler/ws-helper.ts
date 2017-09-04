@@ -125,3 +125,22 @@ export function passAnswerToTarget(data) {
         targetUser.ws.send(JSON.stringify(outputMessage));
     }
 }
+
+export function relayWebConsoleMessage(data) {
+    let targetUser = _.find(activeUsers, {
+        username: data.toName,
+        deviceId: data.toId
+    });
+
+    console.log(data)
+
+    if (!_.isEmpty(targetUser)) {
+        console.log('target Available')
+        let outputMessage = _.cloneDeep(sampleMessage);
+        outputMessage.type = wsm.webConsoleRelay;
+        outputMessage.message = data;
+        targetUser.ws.send(JSON.stringify(outputMessage));
+    } else {
+        console.log('target offline');
+    }
+}

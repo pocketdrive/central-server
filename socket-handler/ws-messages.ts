@@ -7,3 +7,7 @@ export const connectionOffer = 'connectionOffer';
 export const acceptOffer = 'acceptOffer';
 export const isOnline = 'isOnline';
 export const getActiveDevices = 'getActiveDevices';
+
+
+export const webConsoleRegister = 'webConsoleRegister';
+export const webConsoleRelay = 'webConsoleRelay';
