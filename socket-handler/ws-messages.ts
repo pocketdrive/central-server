@@ -3,6 +3,11 @@
  */
 export const createAccount = 'createAccount';
 export const registerDevice = 'registerDevice';
-export const connectTo = 'connectTo';
+export const connectionOffer = 'connectionOffer';
+export const acceptOffer = 'acceptOffer';
 export const isOnline = 'isOnline';
 export const getActiveDevices = 'getActiveDevices';
+
+
+export const webConsoleRegister = 'webConsoleRegister';
+export const webConsoleRelay = 'webConsoleRelay';

@@ -3,7 +3,6 @@
  */
 import WebSocketHandler from './socket-handler/websocket-handler';
 
-console.log('Starting WS Server');
 const wss = new WebSocketHandler();
 console.log('Started WS Server');
 

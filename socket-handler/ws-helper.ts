@@ -16,7 +16,7 @@ export function removeActiveUser(ws: WebSocket) {
     _.remove(activeUsers, data => {
         return data.ws === ws;
     });
-    console.log('closed');
+
     ws.close();
 }
 
@@ -33,6 +33,11 @@ export function registerDevice(data, ws: WebSocket) {
             deviceId: deviceInfo.deviceId,
             username: deviceInfo.username
         }) === -1) {
+        activeUsers.push(activeUser);
+    } else {
+        _.remove(activeUsers, (user) => {
+            return user.deviceId === deviceInfo.deviceId && user.username === deviceInfo.username ;
+        });
         activeUsers.push(activeUser);
     }
 
@@ -55,7 +60,7 @@ export async function createAccount(userData, ws: WebSocket) {
 
 export function isOnline(info, ws: WebSocket) {
     let index = _.findIndex(activeUsers, {
-        targetId: info.targetId,
+        deviceId: info.deviceId,
         username: info.username
     });
     let outputMessage = _.cloneDeep(sampleMessage);
@@ -81,4 +86,63 @@ export function getOnlineUsers(ws: WebSocket) {
     });
 
     ws.send(JSON.stringify(outputMessage));
+}
+
+export function sendOfferToDevice(data, ws: WebSocket) {
+    let outputMessage = _.cloneDeep(sampleMessage);
+    let targetUser = _.find(activeUsers, {
+        deviceId: data.deviceId,
+        username: data.username
+    });
+
+    outputMessage.type = wsm.connectionOffer;
+
+    if (_.isEmpty(targetUser)) {
+        outputMessage.success = false;
+        outputMessage.error = 'Target user does not exists or not online';
+        outputMessage.message = 'Please check again later, or contact link owner';
+
+        ws.send(JSON.stringify(outputMessage));
+    } else {
+        outputMessage.message = 'Sending offer to target';
+        ws.send(JSON.stringify(outputMessage));
+
+        const messageToPeer = {
+            type: wsm.connectionOffer,
+            offer: data.offer,
+            fromUsername: data.fromUsername,
+            fromDeviceId: data.fromDeviceId
+        };
+        targetUser.ws.send(JSON.stringify(messageToPeer));
+    }
+}
+
+export function passAnswerToTarget(data) {
+    let targetUser = _.find(activeUsers, {
+        username: data.acceptedUsername,
+        deviceId: data.acceptedDeviceId
+    });
+
+    if (!_.isEmpty(targetUser)) {
+        let outputMessage = _.cloneDeep(sampleMessage);
+        outputMessage.type = wsm.acceptOffer;
+        outputMessage['answer'] = data.answer;
+        targetUser.ws.send(JSON.stringify(outputMessage));
+    }
+}
+
+export function relayWebConsoleMessage(data, ws) {
+    let targetUser = _.find(activeUsers, {
+        username: data.toName,
+        deviceId: data.toId
+    });
+
+    if (!_.isEmpty(targetUser)) {
+        let outputMessage = _.cloneDeep(sampleMessage);
+        outputMessage.type = wsm.webConsoleRelay;
+        outputMessage.message = data;
+        targetUser.ws.send(JSON.stringify(outputMessage));
+    } else {
+        ws.send('error');
+    }
 }
