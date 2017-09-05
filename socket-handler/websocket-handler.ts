@@ -20,12 +20,14 @@ export default class WebSocketHandler {
     }
 
     static connected(ws: WebSocket) {
+        console.log('connected')
         ws.on('message', (data: string) => WebSocketHandler.onMessage(data, ws));
         ws.on('close', () => WebSocketHandler.onClose(ws));
     }
 
     static onMessage(msg: string, ws: WebSocket) {
         let msgObj;
+
         try {
             msgObj = JSON.parse(msg);
             WebSocketHandler.parseMessage(msgObj, ws);
@@ -35,6 +37,7 @@ export default class WebSocketHandler {
     }
 
     static onClose(ws: WebSocket) {
+        console.log('closed');
         wsh.removeActiveUser(ws);
     }
 
@@ -45,8 +48,7 @@ export default class WebSocketHandler {
                     wsh.registerDevice(msg.data, ws);
                     break;
                 case wsm.webConsoleRelay:
-                    console.log('RELAY TO DEVICE', msg.data);
-                    wsh.relayWebConsoleMessage(msg.data)
+                    wsh.relayWebConsoleMessage(msg.data, ws)
                     break;
             }
         } else {
@@ -69,6 +71,9 @@ export default class WebSocketHandler {
                     break;
                 case wsm.getActiveDevices:
                     wsh.getOnlineUsers(ws);
+                    break;
+                case wsm.webConsoleRelay:
+                    wsh.relayWebConsoleMessage(msg, ws);
                     break;
             }
         }

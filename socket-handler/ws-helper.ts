@@ -34,6 +34,11 @@ export function registerDevice(data, ws: WebSocket) {
             username: deviceInfo.username
         }) === -1) {
         activeUsers.push(activeUser);
+    } else {
+        _.remove(activeUsers, (user) => {
+            return user.deviceId === deviceInfo.deviceId && user.username === deviceInfo.username ;
+        });
+        activeUsers.push(activeUser);
     }
 
     outputMessage.type = wsm.registerDevice;
@@ -126,21 +131,18 @@ export function passAnswerToTarget(data) {
     }
 }
 
-export function relayWebConsoleMessage(data) {
+export function relayWebConsoleMessage(data, ws) {
     let targetUser = _.find(activeUsers, {
         username: data.toName,
         deviceId: data.toId
     });
 
-    console.log(data)
-
     if (!_.isEmpty(targetUser)) {
-        console.log('target Available')
         let outputMessage = _.cloneDeep(sampleMessage);
         outputMessage.type = wsm.webConsoleRelay;
         outputMessage.message = data;
         targetUser.ws.send(JSON.stringify(outputMessage));
     } else {
-        console.log('target offline');
+        ws.send('error');
     }
 }
