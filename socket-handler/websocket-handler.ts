@@ -10,8 +10,9 @@ import * as wsm from './ws-messages'
 export default class WebSocketHandler {
     wss: WebSocket.Server;
 
-    constructor() {
-        this.wss = new WebSocket.Server({port: 8080});
+    constructor(webServer) {
+        //const wss = new WebSocket.Server({ server });
+        this.wss = new WebSocket.Server({server: webServer});
         this.init();
     }
 
