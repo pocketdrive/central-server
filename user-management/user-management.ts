@@ -4,22 +4,17 @@
 
 import * as DataStore from 'nedb';
 import * as _ from 'lodash';
+import * as sha256 from 'sha256';
 
 const db = new DataStore({filename: './db/users.db', autoload: true});
 
 export default class UserManagement {
 
-    static async createUser(userData) {
-        const user = await new Promise(resolve =>
-            db.findOne({username: userData.username}, (err, doc) => resolve(doc))
-        );
-
-        if (_.isEmpty(user)) {
-            db.insert(userData);
-            return true;
-        } else {
-            return false;
-        }
+    static createUser(userData) {
+        return new Promise(resolve =>
+            db.findOne({username: userData.username}, (err, doc) => {
+                resolve(doc)
+            }));
     }
 
     static async deleteUser() {
@@ -29,4 +24,14 @@ export default class UserManagement {
     static async updateUser() {
 
     }
+
+    static searchUser(searchObj) {
+        return new Promise(resolve =>
+            db.findOne({username: searchObj.username, password: sha256(searchObj.password)},
+                (err, doc) => {
+                    resolve(!err ? doc : null);
+                }));
+    }
+
+
 }

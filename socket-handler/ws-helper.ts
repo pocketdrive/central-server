@@ -53,7 +53,7 @@ export async function createAccount(userData, ws: WebSocket) {
 
     outputMessage.type = wsm.createAccount;
     outputMessage.message = status ? 'Account created successfully' : 'Failed';
-    outputMessage.success = status;
+    // outputMessage.success = status;
 
     ws.send(JSON.stringify(outputMessage));
 }
