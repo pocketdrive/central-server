@@ -12,18 +12,23 @@ router.post('/login', async (req, res, next) => {
     res.set('Content-Type', 'application/json');
 
     const userData = req.body;
-    const user  = await UserManagement.searchUser(userData);
+    const user = <any>await UserManagement.searchUser(userData);
 
-    let result = {success:false};
-    if(_.isEmpty(user)) {
+    let result = {success: false, device: [],message:""};
+    if (_.isEmpty(user)) {
+        result.message="Invalid";
         res.send(result);
     } else {
-        result.success=true;
-        res.send(result);
+        if (user.device) {
+            result.device = user.device;
+            result.success = true;
+            res.send(result);
+        } else {
+            result.message="NoDevice";
+            res.send(result);
+        }
+
     }
-
-
-
 
 
 });

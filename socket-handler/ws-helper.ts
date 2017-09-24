@@ -25,18 +25,17 @@ export function registerDevice(data, ws: WebSocket) {
     let outputMessage = _.cloneDeep(sampleMessage);
     let activeUser = _.cloneDeep(sampleActiveUser);
 
-    activeUser.username = deviceInfo.username;
     activeUser.deviceId = deviceInfo.deviceId;
     activeUser.ws = ws;
+    console.log(deviceInfo.deviceId);
 
     if (_.findIndex(activeUsers, {
             deviceId: deviceInfo.deviceId,
-            username: deviceInfo.username
         }) === -1) {
         activeUsers.push(activeUser);
     } else {
         _.remove(activeUsers, (user) => {
-            return user.deviceId === deviceInfo.deviceId && user.username === deviceInfo.username ;
+            return user.deviceId === deviceInfo.deviceId;
         });
         activeUsers.push(activeUser);
     }
@@ -133,7 +132,6 @@ export function passAnswerToTarget(data) {
 
 export function relayWebConsoleMessage(data, ws) {
     let targetUser = _.find(activeUsers, {
-        username: data.toName,
         deviceId: data.toId
     });
 
