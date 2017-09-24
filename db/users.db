@@ -1,2 +1,3 @@
-{"username":"anuradha","password":"5994471abb01112afcc18159f6cc74b4f511b99806da59b3caf5a9c173cacfc5","firstname":"Anuradha","lastname":"Sanjeewa","device":{"name":"PD1","uuid":"PD1234"},"_id":"HuwGmi9Tjkt8LJNZ"}
-{"username":"ravidu","password":"5994471abb01112afcc18159f6cc74b4f511b99806da59b3caf5a9c173cacfc5","firstname":"Ravidu","lastname":"Lashan","device":{"name":"PD1","uuid":"PD1234"},"_id":"kwLmbSaAskxsXZZ7"}
+{"username":"anuradha","password":"5994471abb01112afcc18159f6cc74b4f511b99806da59b3caf5a9c173cacfc5","firstname":"Anuradha","lastname":"Sanjeewa","device":{"name":"PD1","uuid":"PD12345"},"_id":"HuwGmi9Tjkt8LJNZ"}
+{"username":"ravidu","password":"5994471abb01112afcc18159f6cc74b4f511b99806da59b3caf5a9c173cacfc5","firstname":"Ravidu","lastname":"Lashan","device":[{"name":"PD1","uuid":"PD12345"},{"name":"PD2","uuid":"PD2345"},{"name":"PD2","uuid":"PD345"}],"_id":"MzdU1qAJpdMS4qcb"}
+{"username":"dulaj","password":"5994471abb01112afcc18159f6cc74b4f511b99806da59b3caf5a9c173cacfc5","firstname":"Dulaj","lastname":"Randima","device":[{"name":"PD1","uuid":"PD12345"},{"name":"PD2","uuid":"PD2345"}],"_id":"kqWilFRnOOE8FlSo"}
