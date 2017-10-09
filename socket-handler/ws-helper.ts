@@ -25,18 +25,16 @@ export function registerDevice(data, ws: WebSocket) {
     let outputMessage = _.cloneDeep(sampleMessage);
     let activeUser = _.cloneDeep(sampleActiveUser);
 
-    activeUser.username = deviceInfo.username;
     activeUser.deviceId = deviceInfo.deviceId;
     activeUser.ws = ws;
 
     if (_.findIndex(activeUsers, {
             deviceId: deviceInfo.deviceId,
-            username: deviceInfo.username
         }) === -1) {
         activeUsers.push(activeUser);
     } else {
         _.remove(activeUsers, (user) => {
-            return user.deviceId === deviceInfo.deviceId && user.username === deviceInfo.username ;
+            return user.deviceId === deviceInfo.deviceId;
         });
         activeUsers.push(activeUser);
     }
@@ -61,7 +59,6 @@ export async function createAccount(userData, ws: WebSocket) {
 export function isOnline(info, ws: WebSocket) {
     let index = _.findIndex(activeUsers, {
         deviceId: info.deviceId,
-        // username: info.username
     });
     let outputMessage = _.cloneDeep(sampleMessage);
     outputMessage.type = wsm.isOnline;
@@ -92,7 +89,6 @@ export function sendOfferToDevice(data, ws: WebSocket) {
     let outputMessage = _.cloneDeep(sampleMessage);
     let targetUser = _.find(activeUsers, {
         deviceId: data.deviceId,
-        // username: data.username
     });
 
     outputMessage.type = wsm.connectionOffer;
@@ -119,7 +115,6 @@ export function sendOfferToDevice(data, ws: WebSocket) {
 
 export function passAnswerToTarget(data) {
     let targetUser = _.find(activeUsers, {
-        // username: data.acceptedUsername,
         deviceId: data.acceptedDeviceId
     });
 
@@ -133,7 +128,6 @@ export function passAnswerToTarget(data) {
 
 export function relayWebConsoleMessage(data, ws) {
     let targetUser = _.find(activeUsers, {
-        // username: data.toName,
         deviceId: data.toId
     });
 

@@ -11,10 +11,13 @@ const db = new DataStore({filename: './db/users.db', autoload: true});
 export default class UserManagement {
 
     static createUser(userData) {
-        return new Promise(resolve =>
+        const user = new Promise(resolve =>
             db.findOne({username: userData.username}, (err, doc) => {
                 resolve(doc)
             }));
+        if (_.isEmpty(user)) {
+            db.insert(userData);
+        }
     }
 
     static async deleteUser() {
