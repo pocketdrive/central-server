@@ -8,7 +8,7 @@ import UserManagement from '../user-management/user-management';
 import * as wsm from './ws-messages';
 
 const sampleMessage = {type: '', success: true, error: '', message: ''};
-const sampleActiveUser: { deviceId: string, username: string, ws: WebSocket } = {deviceId: '', username: '', ws: null};
+const sampleActiveUser: { deviceId: string, ws: WebSocket } = {deviceId: '', ws: null};
 
 let activeUsers: Array<any> = [];
 
