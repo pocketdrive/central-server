@@ -61,7 +61,7 @@ export async function createAccount(userData, ws: WebSocket) {
 export function isOnline(info, ws: WebSocket) {
     let index = _.findIndex(activeUsers, {
         deviceId: info.deviceId,
-        username: info.username
+        // username: info.username
     });
     let outputMessage = _.cloneDeep(sampleMessage);
     outputMessage.type = wsm.isOnline;
@@ -92,7 +92,7 @@ export function sendOfferToDevice(data, ws: WebSocket) {
     let outputMessage = _.cloneDeep(sampleMessage);
     let targetUser = _.find(activeUsers, {
         deviceId: data.deviceId,
-        username: data.username
+        // username: data.username
     });
 
     outputMessage.type = wsm.connectionOffer;
@@ -119,7 +119,7 @@ export function sendOfferToDevice(data, ws: WebSocket) {
 
 export function passAnswerToTarget(data) {
     let targetUser = _.find(activeUsers, {
-        username: data.acceptedUsername,
+        // username: data.acceptedUsername,
         deviceId: data.acceptedDeviceId
     });
 
@@ -133,7 +133,7 @@ export function passAnswerToTarget(data) {
 
 export function relayWebConsoleMessage(data, ws) {
     let targetUser = _.find(activeUsers, {
-        username: data.toName,
+        // username: data.toName,
         deviceId: data.toId
     });
 
